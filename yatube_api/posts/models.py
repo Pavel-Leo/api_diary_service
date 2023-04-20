@@ -2,19 +2,24 @@ from django.contrib.auth import get_user_model
 from django.db import models
 
 User = get_user_model()
-TEXT_SYMBOLS = 15
+TEXT_SYMBOLS: int = 15
 
 
 class Group(models.Model):
+    """Модель группы пользователей."""
+
     title = models.CharField(max_length=200)
     slug = models.SlugField(unique=True)
     description = models.TextField()
 
     def __str__(self):
+        """Возвращает строковое представление объекта группы."""
         return self.title[:TEXT_SYMBOLS]
 
 
 class Post(models.Model):
+    """Модель постов."""
+
     text = models.TextField()
     pub_date = models.DateTimeField("Дата публикации", auto_now_add=True)
     author = models.ForeignKey(
@@ -30,10 +35,14 @@ class Post(models.Model):
     image = models.ImageField(upload_to="posts/", null=True, blank=True)
 
     def __str__(self):
+        """Возвращает строковое представление объекта группы."""
+
         return self.text[:TEXT_SYMBOLS]
 
 
 class Comment(models.Model):
+    """Модель комментариев."""
+
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="comments"
     )
@@ -46,10 +55,14 @@ class Comment(models.Model):
     )
 
     def __str__(self):
+        """Возвращает строковое представление объекта группы."""
+
         return self.text[:TEXT_SYMBOLS]
 
 
 class Follow(models.Model):
+    """Модель подписок."""
+
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="follower"
     )
@@ -58,6 +71,7 @@ class Follow(models.Model):
     )
 
     def __str__(self):
+        """Возвращает строковое представление объекта группы."""
         return f"{self.user} подписан на {self.following}"
 
     class Meta:

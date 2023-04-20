@@ -1,22 +1,14 @@
-from api.permissions import (
-    IsAdminOrReadOnlyPermission,
-    IsAuthorOrReadOnlyPermission,
-    IsOwnerOrNoAccess,
-)
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-from posts.models import Group, Post, Follow
-from rest_framework import permissions, status, viewsets
-from rest_framework.exceptions import PermissionDenied, ValidationError
-from rest_framework.pagination import PageNumberPagination
-from rest_framework.response import Response
-from . my_viewsets import CreateListViewSet
-from . serializers import (
-    CommentSerializer,
-    FollowSerializer,
-    GroupSerializer,
-    PostSerializer,
-)
+from rest_framework import filters, permissions, viewsets
+from rest_framework.pagination import LimitOffsetPagination
+
+from api.permissions import (IsAdminOrReadOnlyPermission,
+                             IsAuthorOrReadOnlyPermission)
+from posts.models import Follow, Group, Post
+
+from .serializers import (CommentSerializer, FollowSerializer, GroupSerializer,
+                          PostSerializer)
 
 User = get_user_model()
 
@@ -28,8 +20,11 @@ class PostViewSet(viewsets.ModelViewSet):
 
     queryset = Post.objects.all()
     serializer_class = PostSerializer
-    # pagination_class = LimitOffsetPagination
-    permission_classes = (IsAuthorOrReadOnlyPermission, permissions.IsAuthenticatedOrReadOnly, )
+    pagination_class = LimitOffsetPagination
+    permission_classes = (
+        IsAuthorOrReadOnlyPermission,
+        permissions.IsAuthenticatedOrReadOnly,
+    )
 
     def perform_create(self, serializer):
         """Создает новый пост с автором, равным текущему пользователю."""
@@ -43,7 +38,6 @@ class GroupViewSet(viewsets.ModelViewSet):
 
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
-    # pagination_class = PageNumberPagination
     permission_classes = (IsAdminOrReadOnlyPermission,)
 
 
@@ -54,9 +48,10 @@ class CommentViewSet(viewsets.ModelViewSet):
     """
 
     serializer_class = CommentSerializer
-    # pagination_class = PageNumberPagination
-    permission_classes = (IsAuthorOrReadOnlyPermission, permissions.IsAuthenticatedOrReadOnly,)
-
+    permission_classes = (
+        IsAuthorOrReadOnlyPermission,
+        permissions.IsAuthenticatedOrReadOnly,
+    )
 
     def get_queryset(self):
         post = get_object_or_404(Post, id=self.kwargs.get("post_id"))
@@ -72,6 +67,9 @@ class FollowViewSet(viewsets.ModelViewSet):
     queryset = Follow.objects.all()
     serializer_class = FollowSerializer
     permission_classes = [permissions.IsAuthenticated]
+    pagination_class = None
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ("following__username", "user__username")
 
     def get_queryset(self):
         return Follow.objects.filter(user=self.request.user)
