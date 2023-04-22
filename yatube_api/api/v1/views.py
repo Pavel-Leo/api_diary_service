@@ -3,8 +3,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import filters, permissions, viewsets
 from rest_framework.pagination import LimitOffsetPagination
 
-from api.v1.permissions import (IsAdminOrReadOnlyPermission,
-                                IsAuthorOrReadOnlyPermission)
+from api.v1.permissions import (IsAuthorOrReadOnlyPermission)
 from api.v1.serializers import (CommentSerializer, FollowSerializer,
                                 GroupSerializer, PostSerializer)
 from posts.models import Follow, Group, Post
@@ -30,14 +29,16 @@ class PostViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user)
 
 
-class GroupViewSet(viewsets.ModelViewSet):
+class GroupViewSet(viewsets.ReadOnlyModelViewSet):
     """Вьюсет для работы с сообществами.
     Позволяет просматривать сообщества.
     """
 
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
-    permission_classes = (IsAdminOrReadOnlyPermission,)
+    permission_classes = (
+        permissions.IsAuthenticatedOrReadOnly,
+    )
 
 
 class CommentViewSet(viewsets.ModelViewSet):
