@@ -20,6 +20,8 @@ INSTALLED_APPS = [
     "rest_framework",
     "djoser",
     "api",
+    "api.v1",
+    "api.v2",
     "posts",
 ]
 
