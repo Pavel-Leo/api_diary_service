@@ -1,4 +1,4 @@
-# api_final_yatube
+# api_posts
 
 ### Описание
 
