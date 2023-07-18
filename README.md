@@ -1,4 +1,4 @@
-# api_posts
+# api_diary_service
 
 ### Описание
 
